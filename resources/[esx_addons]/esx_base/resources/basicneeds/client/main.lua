@@ -41,6 +41,18 @@ AddEventHandler('esx_status:loaded', function(status)
 	end, function(status)
 		status.remove(75)
 	end)
+
+	TriggerEvent('esx_status:registerStatus', 'stress', 0, '#0C98F1', function(status)
+		return true
+	end, function(status)
+		status.add(75)
+	end)
+
+	TriggerEvent('esx_status:registerStatus', 'drunk', 0, '#0C98F1', function(status)
+		return true
+	end, function(status)
+		status.remove(75)
+	end)
 end)
 
 AddEventHandler('esx_status:onTick', function(data)
