@@ -8,7 +8,7 @@ function GetStatusData(minimal)
 			table.insert(status, {
 				name    = Status[i].name,
 				val     = Status[i].val,
-				percent = (Status[i].val / Config.StatusMax) * 100
+				percent = (Status[i].val / ShStatus.StatusMax) * 100
 			})
 		else
 			table.insert(status, {
@@ -16,7 +16,7 @@ function GetStatusData(minimal)
 				val     = Status[i].val,
 				color   = Status[i].color,
 				visible = Status[i].visible(Status[i]),
-				percent = (Status[i].val / Config.StatusMax) * 100
+				percent = (Status[i].val / ShStatus.StatusMax) * 100
 			})
 		end
 	end
@@ -42,12 +42,6 @@ RegisterNetEvent('esx:onPlayerLogout')
 AddEventHandler('esx:onPlayerLogout', function()
 	ESX.PlayerLoaded = false
 	Status = {}
-	if Config.Display then
-		SendNUIMessage({
-			update = true,
-			status = Status
-		})
-	end
 end)
 
 RegisterNetEvent('esx_status:load')
@@ -62,7 +56,7 @@ AddEventHandler('esx_status:load', function(status)
 		end
 	end
 
-	if Config.Display then TriggerEvent('esx_status:setDisplay', 0.5) end
+	if ShStatus.Display then TriggerEvent('esx_status:setDisplay', 0.5) end
 
 	CreateThread(function()
 		local data = {}
@@ -76,21 +70,17 @@ AddEventHandler('esx_status:load', function(status)
 				})
 			end
 
-			if Config.Display then
+			if ShStatus.Display then
 				local fullData = data
 				for i=1, #data, 1 do
 					fullData[i].color = Status[i].color
 					fullData[i].visible = Status[i].visible(Status[i])
 				end
-				SendNUIMessage({
-					update = true,
-					status = fullData
-				})
 			end
 
 			TriggerEvent('esx_status:onTick', data)
 			table.wipe(data)
-			Wait(Config.TickTime)
+			Wait(ShStatus.TickTime)
 		end
 	end)
 end)
@@ -103,12 +93,6 @@ AddEventHandler('esx_status:set', function(name, val)
 			break
 		end
 	end
-	if Config.Display then
-		SendNUIMessage({
-			update = true,
-			status = GetStatusData()
-		})
-	end
 end)
 
 RegisterNetEvent('esx_status:add')
@@ -119,12 +103,6 @@ AddEventHandler('esx_status:add', function(name, val)
 			break
 		end
 	end
-	if Config.Display then
-		SendNUIMessage({
-			update = true,
-			status = GetStatusData()
-		})
-	end
 end)
 
 RegisterNetEvent('esx_status:remove')
@@ -134,12 +112,6 @@ AddEventHandler('esx_status:remove', function(name, val)
 			Status[i].remove(val)
 			break
 		end
-	end
-		if Config.Display then
-		SendNUIMessage({
-			update = true,
-			status = GetStatusData()
-		})
 	end
 end)
 
@@ -152,37 +124,10 @@ AddEventHandler('esx_status:getStatus', function(name, cb)
 	end
 end)
 
-AddEventHandler('esx_status:setDisplay', function(val)
-	SendNUIMessage({
-		setDisplay = true,
-		display    = val
-	})
-end)
-
--- Pause menu disable hud display
-if Config.Display then
-	AddEventHandler('esx:pauseMenuActive', function(state)
-		if state then
-			isPaused = true
-			TriggerEvent('esx_status:setDisplay', 0.0)
-			return
-		end
-		isPaused = false
-		TriggerEvent('esx_status:setDisplay', 0.5)
-	end)
-
-	-- Loading screen off event
-	AddEventHandler('esx:loadingScreenOff', function()
-		if not isPaused then
-			TriggerEvent('esx_status:setDisplay', 0.3)
-		end
-	end)
-end
-
 -- Update server
 CreateThread(function()
 	while true do
-		Wait(Config.UpdateInterval)
+		Wait(ShStatus.UpdateInterval)
 		if ESX.PlayerLoaded then TriggerServerEvent('esx_status:update', GetStatusData(true)) end
 	end
 end)

@@ -28,8 +28,8 @@ function CreateStatus(xPlayer, name, default, color, visible, tickCallback, clie
 	end
 
 	function self.add(val)
-		if self.val + val > Config.StatusMax then
-			self.val = Config.StatusMax
+		if self.val + val > ShStatus.StatusMax then
+			self.val = ShStatus.StatusMax
 		else
 			self.val = self.val + val
 		end
@@ -44,7 +44,7 @@ function CreateStatus(xPlayer, name, default, color, visible, tickCallback, clie
 	end
 
 	function self.getPercent()
-		return (self.val / Config.StatusMax) * 100
+		return (self.val / ShStatus.StatusMax) * 100
 	end
 
 	function self.updateClient()
