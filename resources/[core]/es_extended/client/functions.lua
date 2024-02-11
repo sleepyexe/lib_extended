@@ -112,22 +112,21 @@ ESX.HashString = function(str)
     return input_map
 end
 
-local contextAvailable = GetResourceState("esx_context") ~= "missing"
 
 function ESX.OpenContext(...)
-    return contextAvailable and exports["esx_context"]:Open(...) or not contextAvailable and print("[^1ERROR^7] Tried to ^5open^7 context menu, but ^5esx_context^7 is missing!")
+    return exports["es_extended"]:Open(...)
 end
 
 function ESX.PreviewContext(...)
-    return contextAvailable and exports["esx_context"]:Preview(...) or not contextAvailable and print("[^1ERROR^7] Tried to ^5preview^7 context menu, but ^5esx_context^7 is missing!")
+    return exports["es_extended"]:Preview(...)
 end
 
 function ESX.CloseContext(...)
-    return contextAvailable and exports["esx_context"]:Close(...) or not contextAvailable and print("[^1ERROR^7] Tried to ^5close^7 context menu, but ^5esx_context^7 is missing!")
+    return exports["es_extended"]:Close(...)
 end
 
 function ESX.RefreshContext(...)
-    return contextAvailable and exports["esx_context"]:Refresh(...) or not contextAvailable and print("[^1ERROR^7] Tried to ^5Refresh^7 context menu, but ^5esx_context^7 is missing!")
+    return exports["es_extended"]:Refresh(...)
 end
 
 ESX.RegisterInput = function(command_name, label, input_group, key, on_press, on_release)

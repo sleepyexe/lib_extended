@@ -1,17 +1,18 @@
 local activeMenu
-local Debug = ESX.GetConfig().EnableDebug
+local Debug = false
+PREVIEW_KEYBIND = "LMENU"
 
 -- Global functions
 -- [ Post | Open | Closed ]
 
-function Post(fn, ...)
+function PostContext(fn, ...)
     SendNUIMessage({
         func = fn,
         args = { ... },
     })
 end
 
-function Open(position, eles, onSelect, onClose, canClose)
+function OpenContext(position, eles, onSelect, onClose, canClose)
     local canClose = canClose == nil and true or canClose
     activeMenu = {
         position = position,
@@ -23,10 +24,10 @@ function Open(position, eles, onSelect, onClose, canClose)
 
     LocalPlayer.state:set("context:active", true)
 
-    Post("Open", eles, position)
+    PostContext("Open", eles, position)
 end
 
-function Closed()
+function ClosedContext()
     SetNuiFocus(false, false)
 
     local menu = activeMenu
@@ -44,24 +45,29 @@ end
 -- Exports
 -- [ Preview | Open | Close ]
 
-exports("Preview", Open)
+exports("Preview", OpenContext)
 
-exports("Open", function(...)
-    Open(...)
+
+function Open(...)
+    OpenContext(...)
     SetNuiFocus(true, true)
-end)
+end
+exports("Open", Open)
 
-exports("Close", function()
+
+function Close(...)
     if not activeMenu then
         return
     end
 
-    Post("Closed")
+    PostContext("Closed")
 
-    Closed()
-end)
+    ClosedContext()
+end
 
-exports("Refresh", function(eles, position)
+exports("Close", Close)
+
+function Refresh(eles, position)
     if not activeMenu then
         return
     end
@@ -69,8 +75,10 @@ exports("Refresh", function(eles, position)
     activeMenu.eles = eles or activeMenu.eles
     activeMenu.position = position or activeMenu.position
 
-    Post("Open", activeMenu.eles, activeMenu.position)
-end)
+    PostContext("Open", activeMenu.eles, activeMenu.position)
+end
+
+exports("Refresh", Refresh)
 
 -- NUI Callbacks
 -- [ closed | selected | changed ]
@@ -80,7 +88,7 @@ RegisterNUICallback("closed", function(_, cb)
         return cb(false)
     end
     cb(true)
-    Closed()
+    ClosedContext()
 end)
 
 RegisterNUICallback("selected", function(data, cb)
@@ -186,7 +194,7 @@ if Debug then
         print("Ele selected", ele.title)
 
         if ele.name == "close" then
-            exports["esx_context"]:Close()
+            exports["es_extended"]:Close()
         end
 
         if ele.name ~= "submit" then
@@ -199,7 +207,7 @@ if Debug then
             end
         end
 
-        exports["esx_context"]:Close()
+        exports["es_extended"]:Close()
     end
 
     local function onClose()
@@ -207,15 +215,15 @@ if Debug then
     end
 
     RegisterCommand("ctx:preview", function()
-        exports["esx_context"]:Preview(position, eles)
+        exports["es_extended"]:Preview(position, eles)
     end)
 
     RegisterCommand("ctx:open", function()
-        exports["esx_context"]:Open(position, eles, onSelect, onClose)
+        exports["es_extended"]:OpenContext(position, eles, onSelect, onClose)
     end)
 
     RegisterCommand("ctx:close", function()
-        exports["esx_context"]:Close()
+        exports["es_extended"]:Close()
     end)
 
     RegisterCommand("ctx:form", function()
@@ -259,6 +267,6 @@ if Debug then
             },
         }
 
-        exports["esx_context"]:Open(position, formMenu, onSelect, onClose)
+        exports["es_extended"]:OpenContext(position, formMenu, onSelect, onClose)
     end)
 end

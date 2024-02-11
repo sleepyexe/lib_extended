@@ -35,6 +35,7 @@ server_scripts {
 
 client_scripts {
 	'client/common.lua',
+	'client/context.lua',
 	'client/functions.lua',
 	'client/wrapper.lua',
 	'client/modules/callback.lua',
@@ -77,3 +78,5 @@ dependencies {
 	'oxmysql',
 	'spawnmanager',
 }
+
+provide 'esx_context'
